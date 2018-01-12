@@ -11,10 +11,10 @@ import java.util.Arrays;
 public abstract class Handler extends Thread {
 
     private enum State{
-        CONNECTING(0),
-        READING(SelectionKey.OP_READ),
-        PROCESSING(2),
-        WRITING(SelectionKey.OP_WRITE);
+        CONNECTING(0),//0
+        READING(SelectionKey.OP_READ),//1 与OP_READ无关，只是借用其值
+        PROCESSING(2),//2
+        WRITING(SelectionKey.OP_WRITE);//3
 
         private final int opBit;
         private State(int operateBit){
@@ -29,6 +29,7 @@ public abstract class Handler extends Thread {
     protected final ByteBuffer readBuf;
     protected final StringBuilder readData = new StringBuilder();
     protected ByteBuffer writeBuf;
+	private boolean useThreadPool = true;
 
     public Handler(Selector selector, SocketChannel clientChannel){
         this.state = State.CONNECTING;
@@ -48,7 +49,11 @@ public abstract class Handler extends Thread {
         log(selector+" connect success...");
     }
 
-    @Override
+    private void log(String s) {
+    	System.out.println(s);
+	}
+
+	@Override
     public void run() {
         switch (state) {
             case CONNECTING:
@@ -65,7 +70,11 @@ public abstract class Handler extends Thread {
         }
     }
 
-    private void connect() {
+    private void err(String s) {
+    	System.out.println(s);
+	}
+
+	private void connect() {
         interestOps(State.READING);
     }
 
@@ -125,14 +134,18 @@ public abstract class Handler extends Thread {
      */
     private void processAndInterestWrite(){
         Processor processor = new Processor();
-        if(useThreadPool){
+        if(useThreadPool ){
             execute(processor);
         }else{
             processor.run();
         }
     }
 
-    private final class Processor implements Runnable{
+    private void execute(Processor processor) {
+		
+	}
+
+	private final class Processor implements Runnable{
         @Override 
         public void run() { 
             processAndHandOff(); 

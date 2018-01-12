@@ -6,7 +6,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 public abstract class Reactor extends Thread{
 
@@ -61,7 +60,7 @@ public abstract class Reactor extends Thread{
             serverChannel.socket().bind(new InetSocketAddress(port));
             serverChannel.configureBlocking(false);
             SelectionKey key = serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-            key.attach(new Acceptor(selector));
+            key.attach(newAcceptor(selector));
             log(getClass().getSimpleName()+" start on "+port+" ..."+"\n");
         }else{
 
@@ -72,7 +71,7 @@ public abstract class Reactor extends Thread{
         //key.attach(newAcceptor(selector, serverChannel));
     }
 
-    public abstract Acceptor new Acceptor(Selector selector);
+    public abstract Acceptor newAcceptor(Selector selector);
 
     /**
      * 事件和事件处理器的绑定

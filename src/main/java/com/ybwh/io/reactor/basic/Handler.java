@@ -43,8 +43,6 @@ class Handler implements Runnable {
 		input.clear();
 		
 		System.out.println("input:"+DatatypeConverter.printHexBinary(bytes));
-		
-		
 	}
 
 	public void run() {
@@ -77,7 +75,7 @@ class Handler implements Runnable {
 		if (outputIsComplete()){
 			sk.interestOps(SelectionKey.OP_READ);
 			state = READING;
-//			sk.cancel(); // write完就结束了, 关闭select key
+			sk.cancel(); // write完就结束了, 关闭select key
 		}
 			
 

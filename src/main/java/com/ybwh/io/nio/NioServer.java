@@ -1,4 +1,4 @@
-package com.ybwh.io.nio;
+  package com.ybwh.io.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -29,6 +29,7 @@ public class NioServer {
 			ssc = ServerSocketChannel.open();
 			ssc.socket().bind(new InetSocketAddress(port));
 			ssc.configureBlocking(false);
+			//对于ServerSocketChannel来说，accept是惟一的有效操作
 			ssc.register(selector, SelectionKey.OP_ACCEPT);
 			System.out.println("start success,listen on port " + port);
 
@@ -79,7 +80,21 @@ public class NioServer {
 		ServerSocketChannel ssChannel = (ServerSocketChannel) key.channel();
 		SocketChannel sc = ssChannel.accept();
 		sc.configureBlocking(false);
-		//
+		
+		
+		/**
+		 * 调用信道的register()方法可以将一个选择器注册到该信道。
+		 * 在注册过程中，通过存储在int型数据中的位图来指定该信道上的初始兴趣操作集（见上文的"SelectionKey：兴趣操作集"）。
+		 * register()方法将返回一个代表了信道和给定选择器之间的关联的SelectionKey实例。
+		 * validOps()方法用于返回一个指示了该信道上的有效I/O操作集的位图。
+		 * 对于ServerSocketChannel来说，accept是惟一的有效操作，
+		 * 而对于SocketChannel来说，有效操作包括读、写和连接。
+		 * 对于DatagramChannel，只有读写操作是有效的。
+		 * 一个信道可能只与一个选择器注册一次，因此后续对register()方法的调用只是简单地更新该key所关联的兴趣操作集。
+		 * 使用isRegistered()方法可以检查信道是否已经注册了选择器。
+		 * keyFor()方法与第一次调用register()方法返回的是同一个SelectionKey实例，除非该信道没有注册给定的选择器。
+		 */
+		//任何对key（信道）所关联的兴趣操作集的改变，都只在下次调用了select()方法后才会生效。
 		sc.register(key.selector(), SelectionKey.OP_READ, ByteBuffer.allocateDirect(BUF_SIZE));
 		
 	}

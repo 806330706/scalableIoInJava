@@ -26,7 +26,7 @@ public abstract class Acceptor extends Thread {
                  log(selector+" clientChannel not null...");
                  //如果使用阻塞的select方式，且目的是开启了多个reactor池，而不是mainReactor和subReactor的关系的话，
                  //则下面就不是nextSubSelector().selector，而是改为传递当前实例的selector对象即可
-                 handle(useMultipleReactors ? nextSubReactor().selector : selector, clientChannel);
+                 handle(useMultipleReactors ? nextSubReactor() : selector, clientChannel);
              }else{
                  log(selector+" clientChannel is null...");
              }
@@ -35,7 +35,15 @@ public abstract class Acceptor extends Thread {
         }
     }
 
-    /**
+    private Selector nextSubReactor() {
+		return null;
+	}
+
+	private void log(String string) {
+    	System.out.println(string);
+	}
+
+	/**
      * 在每个具体的Handler下调用run方法是为了令其从connecting状态变为reading状态，
      * 和原pdf版本下的做法是一样的，只不过原pdf版本是在构造函数直接修改设置了感兴趣为read事件
      */
